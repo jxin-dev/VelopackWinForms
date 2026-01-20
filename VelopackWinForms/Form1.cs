@@ -20,7 +20,7 @@ namespace VelopackWinForms
             try
             {
                 // Point to your GitHub Repository 
-                var token = Environment.GetEnvironmentVariable("GITHUB_TOKEN");
+                var token = Environment.GetEnvironmentVariable("VELOPACK_SECRET_KEY");
                 if (token is not null)
                 {
                     MessageBox.Show(token);
