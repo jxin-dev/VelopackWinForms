@@ -21,7 +21,11 @@ namespace VelopackWinForms
             {
                 // Point to your GitHub Repository 
                 var token = Environment.GetEnvironmentVariable("GITHUB_TOKEN");
-                var source = new GithubSource("https://github.com/jxin-dev/SampleAppWithVelopackAutoUpdater", token, false);
+                if (token is not null)
+                {
+                    MessageBox.Show(token);
+                }
+                var source = new GithubSource("https://github.com/jxin-dev/VelopackWinForms/releases/latest/download/RELEASES", token, false);
                 var mgr = new UpdateManager(source);
 
                 // 1. Check for new version 
