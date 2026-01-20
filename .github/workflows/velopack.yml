@@ -1,4 +1,3 @@
-# .github/workflows/velopack.yml
 name: Velopack Release
 
 on:
@@ -37,4 +36,4 @@ jobs:
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v1
         with:
-          files: ./publish/* ./releases/*
+          files: ./releases/*
