@@ -1,0 +1,40 @@
+# .github/workflows/velopack.yml
+name: Velopack Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # runs when you push a tag like v1.0.0
+
+jobs:
+  build-and-pack:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Install Velopack CLI
+        run: dotnet tool install -g vpk
+
+      - name: Build Project
+        run: dotnet publish ./VelopackWinForms/VelopackWinForms.csproj -c Release -o ./publish
+
+      - name: Pack with Velopack
+        run: vpk pack --packId "VelopackWinForms" --packVersion "${{ github.ref_name }}" --packDir ./publish --mainExe "VelopackWinForms.exe"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Release Assets
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./publish/* ./releases/*
