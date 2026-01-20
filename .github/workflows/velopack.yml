@@ -26,11 +26,11 @@ jobs:
       - name: Verify secret exists
         shell: pwsh
         run: |
-          if (-not $env:GITHUB_TOKEN) {
-            Write-Error "GITHUB_TOKEN is missing"
+          if (-not $env:VELOPACK_GITHUB_TOKEN) {
+            Write-Error "VELOPACK_GITHUB_TOKEN is missing"
             exit 1
           } else {
-            Write-Host "GITHUB_TOKEN is set"
+            Write-Host "VELOPACK_GITHUB_TOKEN is set"
           }
 
       - name: Install Velopack CLI
