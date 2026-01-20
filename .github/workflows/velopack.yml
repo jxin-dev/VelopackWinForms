@@ -24,7 +24,14 @@ jobs:
         run: dotnet publish ./VelopackWinForms/VelopackWinForms.csproj -c Release -o ./publish
 
       - name: Pack with Velopack
-        run: vpk pack --packId "VelopackWinForms" --packVersion "${{ github.ref_name }}" --packDir ./publish --mainExe "VelopackWinForms.exe"
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}".TrimStart('v')
+          vpk pack `
+            --packId "VelopackWinForms" `
+            --packVersion $version `
+            --packDir ./publish `
+            --mainExe "VelopackWinForms.exe"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
