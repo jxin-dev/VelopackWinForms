@@ -25,7 +25,7 @@ namespace VelopackWinForms
                 {
                     MessageBox.Show(token);
                 }
-                var source = new GithubSource("https://github.com/jxin-dev/VelopackWinForms/", token, false);
+                var source = new GithubSource("https://github.com/jxin-dev/VelopackWinForms", token, false);
                 var mgr = new UpdateManager(source);
 
                 // 1. Check for new version 
