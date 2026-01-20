@@ -6,14 +6,14 @@ on:
       - 'v*'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build-and-pack:
     runs-on: windows-latest
 
     env:
-      VELOPACK_SECRET_KEY: ${{ secrets.VELOPACK_SECRET_KEY }}
+      GITHUB_TOKEN: ${{ secrets.VELOPACK_GITHUB_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
@@ -26,11 +26,11 @@ jobs:
       - name: Verify secret exists
         shell: pwsh
         run: |
-          if (-not $env:VELOPACK_SECRET_KEY) {
-            Write-Error "VELOPACK_SECRET_KEY is missing"
+          if (-not $env:GITHUB_TOKEN) {
+            Write-Error "GITHUB_TOKEN is missing"
             exit 1
           } else {
-            Write-Host "VELOPACK_SECRET_KEY is set"
+            Write-Host "GITHUB_TOKEN is set"
           }
 
       - name: Install Velopack CLI
