@@ -3,7 +3,10 @@ name: Velopack Release
 on:
   push:
     tags:
-      - 'v*'  # runs when you push a tag like v1.0.0
+      - 'v*'
+
+permissions:
+  contents: write
 
 jobs:
   build-and-pack:
