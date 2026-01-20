@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             btnUpdateApp = new Button();
+            label1 = new Label();
             SuspendLayout();
             // 
             // btnUpdateApp
@@ -41,19 +42,31 @@
             btnUpdateApp.UseVisualStyleBackColor = true;
             btnUpdateApp.Click += btnUpdateApp_Click;
             // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(236, 161);
+            label1.Name = "label1";
+            label1.Size = new Size(72, 15);
+            label1.TabIndex = 1;
+            label1.Text = "Version 1.0.1";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(533, 248);
+            Controls.Add(label1);
             Controls.Add(btnUpdateApp);
             Name = "Form1";
             Text = "Form1";
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
 
         private Button btnUpdateApp;
+        private Label label1;
     }
 }
