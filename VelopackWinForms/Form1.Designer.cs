@@ -49,7 +49,7 @@
             label1.Name = "label1";
             label1.Size = new Size(72, 15);
             label1.TabIndex = 1;
-            label1.Text = "Version 1.0.1";
+            label1.Text = "Version 1.0.2";
             // 
             // Form1
             // 
