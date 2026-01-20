@@ -12,13 +12,26 @@ jobs:
   build-and-pack:
     runs-on: windows-latest
 
+    env:
+      VELOPACK_SECRET_KEY: ${{ secrets.VELOPACK_SECRET_KEY }}
+
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
+
+      - name: Verify secret exists
+        shell: pwsh
+        run: |
+          if (-not $env:VELOPACK_SECRET_KEY) {
+            Write-Error "VELOPACK_SECRET_KEY is missing"
+            exit 1
+          } else {
+            Write-Host "VELOPACK_SECRET_KEY is set"
+          }
 
       - name: Install Velopack CLI
         run: dotnet tool install -g vpk
@@ -36,14 +49,8 @@ jobs:
             --packDir ./publish `
             --mainExe "VelopackWinForms.exe"
 
-      - name: Create GitHub Release
+      - name: Create GitHub Release & Upload Assets
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.ref_name }}
-        env:
-          VELOPACK_SECRET_KEY: ${{ secrets.VELOPACK_SECRET_KEY }}
-
-      - name: Upload Release Assets
-        uses: softprops/action-gh-release@v1
-        with:
           files: ./releases/*
