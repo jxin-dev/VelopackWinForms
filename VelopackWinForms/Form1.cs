@@ -20,12 +20,17 @@ namespace VelopackWinForms
             try
             {
                 // Point to your GitHub Repository 
-                var source = new GithubSource("https://github.com/jxin-dev/SampleAppWithVelopackAutoUpdater", null, false);
+                var token = Environment.GetEnvironmentVariable("GITHUB_TOKEN");
+                var source = new GithubSource("https://github.com/jxin-dev/SampleAppWithVelopackAutoUpdater", token, false);
                 var mgr = new UpdateManager(source);
 
                 // 1. Check for new version 
                 var newVersion = await mgr.CheckForUpdatesAsync();
-                if (newVersion == null) return;
+                if (newVersion == null)
+                {
+                    Text += " Application is up-to-date.";
+                    return; 
+                }
 
                 // 2. Download the update 
                 await mgr.DownloadUpdatesAsync(newVersion);
@@ -42,7 +47,7 @@ namespace VelopackWinForms
                 Text += ex.Message;
             }
 
-           
+
         }
     }
 }
