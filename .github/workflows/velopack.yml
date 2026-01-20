@@ -6,14 +6,15 @@ on:
       - 'v*'
 
 permissions:
-  contents: read
+  contents: write  # Required to create releases
 
 jobs:
   build-and-pack:
     runs-on: windows-latest
 
+    # Map your secret PAT to GITHUB_TOKEN for release action
     env:
-      GITHUB_TOKEN: ${{ secrets.VELOPACK_GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
@@ -23,7 +24,7 @@ jobs:
         with:
           dotnet-version: '9.0.x'
 
-      - name: Verify secret exists
+      - name: Verify GitHub token exists
         shell: pwsh
         run: |
           if (-not $env:GITHUB_TOKEN) {
@@ -54,3 +55,5 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           files: ./releases/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
