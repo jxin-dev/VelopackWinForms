@@ -41,7 +41,7 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.VELOPACK_TOKEN_PRIVATE }}
 
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v1
