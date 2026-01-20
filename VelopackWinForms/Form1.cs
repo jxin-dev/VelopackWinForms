@@ -32,7 +32,7 @@ namespace VelopackWinForms
                 var newVersion = await mgr.CheckForUpdatesAsync();
                 if (newVersion == null)
                 {
-                    Text += " Application is up-to-date.";
+                    MessageBox.Show("Application is up-to-date.","Check for updates", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return; 
                 }
 
@@ -45,10 +45,13 @@ namespace VelopackWinForms
             catch (Velopack.Exceptions.NotInstalledException)
             {
                 Text += " (Debug mode – updates disabled)";
+                MessageBox.Show("Debug mode – updates disabled.", "Check for updates", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
             }
             catch (Exception ex)
             {
-                Text += ex.Message;
+                MessageBox.Show(ex.Message, "Check for updates", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
             }
 
 
