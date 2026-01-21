@@ -45,17 +45,17 @@ jobs:
         run: dotnet tool install -g vpk
 
       # ---------------------------
-      # Ensure lock file exists
+      # Ensure packages.lock.json exists
       # ---------------------------
       - name: Ensure packages.lock.json exists
         shell: pwsh
         run: |
-          $projDir = "${{ env.PROJECT_PATH | Split-Path -Parent }}"
+          $projDir = Split-Path "${{ env.PROJECT_PATH }}" -Parent
           $lockFile = Join-Path $projDir "packages.lock.json"
 
           if (-Not (Test-Path $lockFile)) {
               Write-Host "packages.lock.json not found — generating..."
-              dotnet restore ${{ env.PROJECT_PATH }} --use-lock-file
+              dotnet restore "${{ env.PROJECT_PATH }}" --use-lock-file
           } else {
               Write-Host "packages.lock.json exists — skipping generation"
           }
@@ -66,7 +66,7 @@ jobs:
       - name: Publish app
         shell: pwsh
         run: |
-          dotnet publish ${{ env.PROJECT_PATH }} `
+          dotnet publish "${{ env.PROJECT_PATH }}" `
             -c Release `
             -r ${{ env.RUNTIME }} `
             --self-contained true `
