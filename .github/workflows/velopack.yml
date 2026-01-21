@@ -48,7 +48,7 @@ jobs:
       # Restore
       # ---------------------------
       - name: Restore
-        run: dotnet restore ${{ env.PROJECT_PATH }}
+        run: dotnet restore ${{ env.PROJECT_PATH }} --use-lock-file
 
       # ---------------------------
       # Publish app
