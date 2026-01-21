@@ -6,42 +6,163 @@ on:
       - 'v*'
 
 permissions:
-  contents: write  # Required to create releases
+  contents: write
+
+env:
+  APP_NAME: VelopackWinForms
+  PROJECT_PATH: ./VelopackWinForms/VelopackWinForms.csproj
+  RUNTIME: win-x64
+  SIGN_CERT_PATH: ${{ secrets.CODE_SIGN_CERT_PATH }}
+  SIGN_CERT_PASSWORD: ${{ secrets.CODE_SIGN_CERT_PASSWORD }}
+  ICON_PATH: ./VelopackWinForms/assets/app-icon.ico
+  SILENT_INSTALL: true   # Set true to enable silent installer
 
 jobs:
-  build-and-pack:
+  build-and-release:
     runs-on: windows-latest
 
-    # Map your secret PAT to GITHUB_TOKEN for release action
-    # env:
-    # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
     steps:
+      # ---------------------------
+      # Checkout
+      # ---------------------------
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
+      # ---------------------------
+      # Setup .NET
+      # ---------------------------
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
-          
+          cache: true
+
+      # ---------------------------
+      # Install Velopack CLI
+      # ---------------------------
       - name: Install Velopack CLI
         run: dotnet tool install -g vpk
 
-      - name: Build Project
-        run: dotnet publish ./VelopackWinForms/VelopackWinForms.csproj -c Release -o ./publish
+      # ---------------------------
+      # Restore
+      # ---------------------------
+      - name: Restore
+        run: dotnet restore ${{ env.PROJECT_PATH }}
 
+      # ---------------------------
+      # Publish app
+      # ---------------------------
+      - name: Publish app
+        shell: pwsh
+        run: |
+          dotnet publish ${{ env.PROJECT_PATH }} `
+            -c Release `
+            -r ${{ env.RUNTIME }} `
+            --self-contained true `
+            -p:PublishSingleFile=true `
+            -p:IncludeNativeLibrariesForSelfExtract=true `
+            -o publish
+
+      # ---------------------------
+      # Sign executable
+      # ---------------------------
+      - name: Sign executable
+        shell: pwsh
+        run: |
+          signtool sign `
+            /f "${{ env.SIGN_CERT_PATH }}" `
+            /p "${{ env.SIGN_CERT_PASSWORD }}" `
+            /fd SHA256 `
+            /tr http://timestamp.digicert.com `
+            /td SHA256 `
+            publish\${{ env.APP_NAME }}.exe
+
+      # ---------------------------
+      # Resolve version
+      # ---------------------------
+      - name: Resolve version
+        id: version
+        shell: pwsh
+        run: |
+          $v = "${{ github.ref_name }}".TrimStart('v')
+          echo "version=$v" >> $env:GITHUB_OUTPUT
+
+      # ---------------------------
+      # Pack with Velopack
+      # ---------------------------
       - name: Pack with Velopack
         shell: pwsh
         run: |
-          $version = "${{ github.ref_name }}".TrimStart('v')
           vpk pack `
-            --packId "VelopackWinForms" `
-            --packVersion $version `
-            --packDir ./publish `
-            --mainExe "VelopackWinForms.exe"
+            --packId "${{ env.APP_NAME }}" `
+            --packVersion "${{ steps.version.outputs.version }}" `
+            --packDir publish `
+            --mainExe "${{ env.APP_NAME }}.exe" `
+            --runtime ${{ env.RUNTIME }} `
+            --channel stable `
+            --outputDir releases
 
+      # ---------------------------
+      # Sign Velopack package
+      # ---------------------------
+      - name: Sign Velopack package
+        shell: pwsh
+        run: |
+          Get-ChildItem releases\*.vpk | ForEach-Object {
+            signtool sign `
+              /f "${{ env.SIGN_CERT_PATH }}" `
+              /p "${{ env.SIGN_CERT_PASSWORD }}" `
+              /fd SHA256 `
+              /tr http://timestamp.digicert.com `
+              /td SHA256 `
+              $_.FullName
+          }
+
+      # ---------------------------
+      # Generate SHA256 checksums
+      # ---------------------------
+      - name: Generate checksums
+        shell: pwsh
+        run: |
+          Get-FileHash releases\* -Algorithm SHA256 |
+            ForEach-Object {
+              "$($_.Hash)  $($_.Path | Split-Path -Leaf)"
+            } | Out-File releases\SHA256SUMS.txt -Encoding ascii
+
+      # ---------------------------
+      # Create Installer (Setup.exe)
+      # ---------------------------
+      - name: Create Installer
+        shell: pwsh
+        run: |
+          $silentFlag = if ($env:SILENT_INSTALL -eq "true") { "--silent" } else { "" }
+
+          vpk make-installer `
+            --packDir releases `
+            --output releases\Setup-${{ steps.version.outputs.version }}.exe `
+            --icon ${{ env.ICON_PATH }} `
+            --title "${{ env.APP_NAME }}" `
+            $silentFlag `
+            --overwrite
+
+          # Sign the installer
+          signtool sign `
+            /f "${{ env.SIGN_CERT_PATH }}" `
+            /p "${{ env.SIGN_CERT_PASSWORD }}" `
+            /fd SHA256 `
+            /tr http://timestamp.digicert.com `
+            /td SHA256 `
+            releases\Setup-${{ steps.version.outputs.version }}.exe
+
+      # ---------------------------
+      # Upload all artifacts to GitHub Release
+      # ---------------------------
       - name: Create GitHub Release & Upload Assets
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
-          files: ./releases/*
+          name: "${{ env.APP_NAME }} ${{ github.ref_name }}"
+          draft: false
+          prerelease: false
+          files: releases/**
