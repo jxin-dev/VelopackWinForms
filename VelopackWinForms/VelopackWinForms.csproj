@@ -1,21 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
-    <UseWindowsForms>true</UseWindowsForms>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<Nullable>enable</Nullable>
+		<UseWindowsForms>true</UseWindowsForms>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile> <!-- Creates packages.lock.json for deterministic builds; required by Velopack CLI -->
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Velopack" Version="0.0.1298" />
-  </ItemGroup>
 
-  <ItemGroup>
-    <None Update="assets\app-icon.ico">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Velopack" Version="0.0.1298" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="assets\app-icon.ico">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 
 </Project>
