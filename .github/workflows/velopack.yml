@@ -13,8 +13,8 @@ jobs:
     runs-on: windows-latest
 
     # Map your secret PAT to GITHUB_TOKEN for release action
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    # env:
+    # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
@@ -23,17 +23,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
-
-      - name: Verify GitHub token exists
-        shell: pwsh
-        run: |
-          if (-not $env:GITHUB_TOKEN) {
-            Write-Error "GITHUB_TOKEN is missing"
-            exit 1
-          } else {
-            Write-Host "GITHUB_TOKEN is set"
-          }
-
+          
       - name: Install Velopack CLI
         run: dotnet tool install -g vpk
 
@@ -55,5 +45,3 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           files: ./releases/*
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
