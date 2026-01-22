@@ -20,12 +20,7 @@ namespace VelopackWinForms
             try
             {
                 // Point to your GitHub Repository 
-                var token = Environment.GetEnvironmentVariable("GITHUB_TOKEN");
-                if (token is not null)
-                {
-                    MessageBox.Show(token);
-                }
-                var source = new GithubSource("https://github.com/jxin-dev/VelopackWinForms", token, false);
+                var source = new GithubSource("https://github.com/jxin-dev/VelopackWinForms", null, false);
                 var mgr = new UpdateManager(source);
 
                 // 1. Check for new version 
@@ -44,14 +39,12 @@ namespace VelopackWinForms
             }
             catch (Velopack.Exceptions.NotInstalledException)
             {
-                Text += " (Debug mode – updates disabled)";
                 MessageBox.Show("Debug mode – updates disabled.", "Check for updates", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                MessageBox.Show(ex.Message, "Check for updates", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
+                MessageBox.Show("Unable to access the update server.\nPlease check your internet connection or try again later.", "Check for updates", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
 
 
